@@ -32,10 +32,12 @@ function asset(k){
   const fallback={
     homeScene:'assets/scenes/home-final.png',
     resultScene:'assets/scenes/result-garden.png',
-    peek:'assets/characters/rabbit-peek.png',
     carrot:'assets/ui/carrot-marker.png',
     brandLogo:'assets/ui/adhd-brand-logo.png',
     startButton:'assets/ui/start-button-final.png',
+    setupScene:'assets/scenes/child-info-bg.png',
+    nextButton:'assets/ui/next-button.png',
+    prevButton:'assets/ui/prev-button.png',
   };
   return window.ADHD_ASSETS?.[k]||fallback[k];
 }
@@ -75,7 +77,25 @@ function typeSelector(value){
 
 function setup(){
   const f=state.form;
-  return '<section class="panel form-panel screen"><div class="section-heading"><div class="section-heading-copy"><p class="eyebrow">01 / BASIC INFORMATION</p><h2>아동 기본정보</h2><p class="small">검사와 적용 기준에 필요한 정보를 입력해 주세요.</p></div><span class="section-token" aria-hidden="true">✎</span></div>'+typeSelector(f.type)+'<div class="form-grid">'+select('grade','학년',S.choices[f.type],f.grade)+input('name','아동 이름 <span class="req">*</span>',f.name,'maxlength="40" placeholder="아동 이름"')+select('sex','성별',[['','선택해 주세요'],['M','남'],['F','여']],f.sex)+input('birth','생년월일 <span class="req">*</span>',f.birth,'inputmode="numeric" maxlength="6" placeholder="예: 920516 (6자리)"')+input('testDate','검사일 <span class="req">*</span>',f.testDate,'type="date"')+input('org','기관명',f.org,'maxlength="60" placeholder="기관명"')+'</div><div class="age-info" id="ageInfo">생년월일을 입력하면 만 나이와 적용 기준을 확인할 수 있습니다.</div><p class="form-side-note">학년 항목은 결과에 적용할 기준입니다. 실제 나이가 선택 검사지의 범위를 벗어나면 최저 또는 최고 기준으로 참고 적용됩니다.</p><div id="error" class="error" role="alert"></div><div class="actions"><button class="btn" data-action="home">처음으로</button><button class="btn primary" data-action="start">검사 시작 <span aria-hidden="true">→</span></button></div></section>';
+  const typeItems=[['low','저학년용'],['high','고학년용']];
+  return '<section class="setup-visual screen">'
+    +'<img class="setup-visual-bg" src="'+asset('setupScene')+'" alt="아동 기본정보">'
+    +'<div class="setup-live-controls">'
+      +'<fieldset class="setup-control setup-control-type"><legend class="sr-only">유형</legend><div class="setup-segmented">'+typeItems.map(([v,l])=>'<span class="setup-segment"><input type="radio" name="type" id="type-'+v+'" value="'+v+'" '+(f.type===v?'checked':'')+'><label for="type-'+v+'">'+l+'</label></span>').join('')+'</div></fieldset>'
+      +'<div class="setup-control setup-control-grade"><label class="sr-only" for="grade">학년도</label><select id="grade">'+S.choices[f.type].map(([v,l])=>'<option value="'+v+'" '+(v===f.grade?'selected':'')+'>'+l+'</option>').join('')+'</select></div>'
+      +'<div class="setup-control setup-control-name"><label class="sr-only" for="name">아동 이름</label><input id="name" value="'+esc(f.name)+'" maxlength="40" placeholder="아동 이름을 입력해 주세요." autocomplete="off"></div>'
+      +'<fieldset class="setup-control setup-control-sex"><legend class="sr-only">성별</legend><div class="setup-segmented setup-sex-segmented"><span class="setup-segment"><input type="radio" name="sexChoice" id="sex-m" value="M" '+(f.sex==='M'?'checked':'')+'><label for="sex-m">남아</label></span><span class="setup-segment"><input type="radio" name="sexChoice" id="sex-f" value="F" '+(f.sex==='F'?'checked':'')+'><label for="sex-f">여아</label></span></div><select id="sex" class="sr-only" tabindex="-1" aria-hidden="true"><option value=""></option><option value="M" '+(f.sex==='M'?'selected':'')+'>남</option><option value="F" '+(f.sex==='F'?'selected':'')+'>여</option></select></fieldset>'
+      +'<div class="setup-control setup-control-birth"><label class="sr-only" for="birth">생년월일</label><input id="birth" value="'+esc(f.birth)+'" inputmode="numeric" maxlength="6" placeholder="예: 200315 (6자리)" autocomplete="off"></div>'
+      +'<div class="setup-control setup-control-date"><label class="sr-only" for="testDate">검사일</label><input id="testDate" value="'+esc(f.testDate)+'" type="date"></div>'
+      +'<div class="setup-control setup-control-org"><label class="sr-only" for="org">기관명</label><input id="org" value="'+esc(f.org)+'" maxlength="60" placeholder="기관명을 입력해 주세요." autocomplete="off"></div>'
+    +'</div>'
+    +'<div id="ageInfo" class="sr-only">생년월일을 입력하면 만 나이와 적용 기준을 확인할 수 있습니다.</div>'
+    +'<div id="error" class="setup-visual-error" role="alert"></div>'
+    +'<div class="setup-nav-images">'
+      +'<button class="setup-nav-image setup-prev-image" data-action="home" aria-label="이전"><img src="'+asset('prevButton')+'" alt="이전"></button>'
+      +'<button class="setup-nav-image setup-next-image" data-action="start" aria-label="다음"><img src="'+asset('nextButton')+'" alt="다음"></button>'
+    +'</div>'
+  +'</section>';
 }
 
 function questions(){return D[state.form.type].questions;}
@@ -129,8 +149,7 @@ function test(){
   const qs=questions();
   const list=pageQuestions();
   const {currentPage,totalPages}=pageProgress();
-  const rings='<span></span>'.repeat(6);
-  return '<section class="questionnaire-frame screen"><div class="binder-rings" aria-hidden="true">'+rings+'</div><img class="question-rabbit" src="'+asset('peek')+'" alt="" aria-hidden="true"><div class="questionnaire-paper"><div class="q-headline"><div><p class="eyebrow q-kicker">02 / QUESTIONNAIRE</p><h2>평소 아이의 모습은 어떤가요?</h2><p class="small">'+list[0].no+'–'+list.at(-1).no+'번 · 전체 '+qs.length+'문항</p></div></div><div class="progress-block"><div class="progress-copy"><span id="progressText">'+currentPage+' / '+totalPages+' 페이지</span><strong id="progressPercent"><span class="percent-value">0%</span></strong></div><div class="carrot-progress" id="progressRoot" style="--ratio:0"><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="'+totalPages+'" aria-valuenow="0" aria-label="완료한 페이지 진행률"><i class="progress-fill" id="progressFill" style="width:0%"></i></div><img class="progress-marker" src="'+asset('carrot')+'" alt=""></div></div><div class="questions">'+list.map(q=>'<article class="question" id="q-'+q.no+'"><div class="q-title"><span class="number">'+q.no+'</span><span id="label-'+q.no+'">'+esc(q.text)+'</span></div><div class="options" role="radiogroup" aria-labelledby="label-'+q.no+'">'+answerLabels.map((label,v)=>'<div class="option"><input type="radio" name="q'+q.no+'" id="a-'+q.no+'-'+v+'" data-no="'+q.no+'" value="'+v+'" '+(state.answers[q.no-1]===v?'checked':'')+'><label for="a-'+q.no+'-'+v+'">'+label+'</label></div>').join('')+'</div></article>').join('')+'</div><div id="error" class="error" role="alert"></div><div class="q-footer"><button class="btn" data-action="prev">← 이전</button><span class="page-count">'+(state.page+1)+' / '+Math.ceil(qs.length/8)+' 페이지</span><button class="btn primary" data-action="next">'+(state.page===Math.ceil(qs.length/8)-1?'결과 보기':'다음 →')+'</button></div><button class="text-btn test-edit" data-action="setup">기본정보 수정</button><span class="frame-carrot" aria-hidden="true"></span></div></section>';
+  return '<section class="questionnaire-frame screen"><div class="questionnaire-paper"><div class="q-headline"><div><p class="eyebrow q-kicker">02 / QUESTIONNAIRE</p><h2>평소 아이의 모습은 어떤가요?</h2><p class="small">'+list[0].no+'–'+list.at(-1).no+'번 · 전체 '+qs.length+'문항</p></div></div><div class="progress-block"><div class="progress-copy"><span id="progressText">'+currentPage+' / '+totalPages+' 페이지</span><strong id="progressPercent"><span class="percent-value">0%</span></strong></div><div class="carrot-progress" id="progressRoot" style="--ratio:0"><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="'+totalPages+'" aria-valuenow="0" aria-label="완료한 페이지 진행률"><i class="progress-fill" id="progressFill" style="width:0%"></i></div><span class="progress-marker" aria-hidden="true"></span></div></div><div class="questions">'+list.map(q=>'<article class="question" id="q-'+q.no+'"><div class="q-title"><span class="number">'+q.no+'</span><span id="label-'+q.no+'">'+esc(q.text)+'</span></div><div class="options" role="radiogroup" aria-labelledby="label-'+q.no+'">'+answerLabels.map((label,v)=>'<div class="option"><input type="radio" name="q'+q.no+'" id="a-'+q.no+'-'+v+'" data-no="'+q.no+'" value="'+v+'" '+(state.answers[q.no-1]===v?'checked':'')+'><label for="a-'+q.no+'-'+v+'">'+label+'</label></div>').join('')+'</div></article>').join('')+'</div><div id="error" class="error" role="alert"></div><div class="q-footer"><button class="btn" data-action="prev">← 이전</button><span class="page-count">'+(state.page+1)+' / '+Math.ceil(qs.length/8)+' 페이지</span><button class="btn primary" data-action="next">'+(state.page===Math.ceil(qs.length/8)-1?'결과 보기':'다음 →')+'</button></div><button class="text-btn test-edit" data-action="setup">기본정보 수정</button></div></section>';
 }
 
 function loading(){
@@ -273,6 +292,9 @@ document.addEventListener('input',e=>{
 
 document.addEventListener('change',e=>{
   if(state.view==='setup'){
+    if(e.target.name==='sexChoice'){
+      if($('sex'))$('sex').value=e.target.value;
+    }
     if(e.target.name==='type'){
       const f=readForm();
       $('grade').innerHTML=S.choices[f.type].map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('');
