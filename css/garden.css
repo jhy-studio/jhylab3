@@ -149,6 +149,7 @@ body[data-screen="home"] .app{
   border:0;
   background:transparent;
   transform:translateX(-50%);
+  transform-origin:center center;
   cursor:pointer;
   filter:drop-shadow(0 12px 20px rgba(255,120,98,.18));
 }
@@ -156,9 +157,12 @@ body[data-screen="home"] .app{
   display:block;
   width:100%;
   height:auto;
+  animation:hero-start-bob 1.9s ease-in-out infinite, hero-start-glow 2.2s ease-in-out infinite;
+  transform-origin:center center;
+  will-change:transform,filter;
 }
-.hero-final-start:hover{transform:translateX(-50%) scale(1.01)}
-.hero-final-start:active{transform:translateX(-50%) scale(.985)}
+.hero-final-start:hover img{animation-play-state:paused;transform:translateY(-4px) scale(1.03)}
+.hero-final-start:active img{transform:translateY(0) scale(.985)}
 .hero-final-start:focus-visible{
   outline:3px solid rgba(70,145,235,.48);
   outline-offset:5px;
@@ -575,6 +579,52 @@ body[data-screen="test"] .brand-logo{height:52px;max-width:min(60vw,440px)}
   *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
 
+
+/* Home image ratio lock: keep the 941×1672 artwork undistorted even when mobile browser chrome opens/closes. */
+@media screen{
+  body[data-screen="home"] .app{
+    width:min(430px,100%)!important;
+    max-width:430px!important;
+    margin:0 auto!important;
+    padding:0!important;
+  }
+  body[data-screen="home"] .hero-card{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:941 / 1672!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  body[data-screen="home"] .hero-final-bg{
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:fill!important;
+  }
+  body[data-screen="home"] .hero-final-start{
+    position:absolute!important;
+    left:50%!important;
+    bottom:4.2%!important;
+    width:73%!important;
+    margin:0!important;
+    padding:0!important;
+    transform:translateX(-50%)!important;
+  }
+  body[data-screen="home"] .hero-final-start img{
+    animation:hero-start-bob 1.9s ease-in-out infinite, hero-start-glow 2.2s ease-in-out infinite!important;
+  }
+}
+
 @media print{
   @page{size:A4 portrait;margin:0}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
@@ -585,20 +635,8 @@ body[data-screen="test"] .brand-logo{height:52px;max-width:min(60vw,440px)}
   .print-a4-stage{display:block!important;width:210mm!important;height:297mm!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important}
   .print-a4-stage canvas{display:block!important;width:210mm!important;height:297mm!important;margin:0!important;padding:0!important}
 }
-@media (max-width:520px){
-  body[data-screen="home"] .app{width:calc(100% - 16px);padding-top:8px}
-  .hero-card{min-height:calc(100dvh - 16px);border-radius:28px}
-  .hero-content{padding:0 16px 20px}
-  .hero-logo{width:min(94%,334px);margin-top:38px}
-  .hero-tagline{max-width:320px;font-size:18px;margin-top:8px;line-height:1.54}
-  .hero-characters{min-height:320px;margin-top:16px}
-  .hero-rabbit-figure{left:11%;width:42%;max-width:142px}
-  .hero-house-figure{right:8%;width:39%;max-width:149px}
-  .hero-start{width:min(90%,280px);min-height:54px;margin-bottom:18px;font-size:21px}
-}
 
-.hero-start:before{display:none}
 
-@media(max-width:520px){
-  body[data-screen="home"] .app{width:100%;max-width:430px}
+@media (prefers-reduced-motion:reduce){
+  .hero-final-start img{animation:none!important}
 }
