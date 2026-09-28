@@ -151,18 +151,45 @@ body[data-screen="home"] .app{
   transform:translateX(-50%);
   transform-origin:center center;
   cursor:pointer;
-  filter:drop-shadow(0 12px 20px rgba(255,120,98,.18));
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
 .hero-final-start img{
+  position:relative;
+  z-index:2;
   display:block;
   width:100%;
   height:auto;
-  animation:hero-start-bob 1.9s ease-in-out infinite, hero-start-glow 2.2s ease-in-out infinite;
   transform-origin:center center;
+  animation:cta-breathe 2.8s cubic-bezier(.4,0,.2,1) infinite,cta-shadow 2.8s cubic-bezier(.4,0,.2,1) infinite;
   will-change:transform,filter;
 }
-.hero-final-start:hover img{animation-play-state:paused;transform:translateY(-4px) scale(1.03)}
-.hero-final-start:active img{transform:translateY(0) scale(.985)}
+.hero-final-start:before{
+  content:'';
+  position:absolute;
+  z-index:1;
+  left:7%;right:7%;top:13%;bottom:13%;
+  border-radius:999px;
+  background:rgba(255,132,104,.13);
+  filter:blur(12px);
+  animation:cta-halo 2.8s cubic-bezier(.4,0,.2,1) infinite;
+  pointer-events:none;
+}
+.hero-final-start:after{
+  content:'';
+  position:absolute;
+  z-index:3;
+  left:7%;right:7%;top:13%;bottom:13%;
+  border-radius:999px;
+  pointer-events:none;
+  opacity:0;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.34) 47%,rgba(255,255,255,.10) 54%,transparent 70%);
+  background-size:260% 100%;
+  background-position:150% 0;
+  animation:cta-sheen 4.8s ease-in-out infinite;
+}
+@media(hover:hover){.hero-final-start:hover img{transform:translateY(-2px) scale(1.018)}}
+.hero-final-start:active img{animation-play-state:paused;transform:scale(.965);transition:transform .09s cubic-bezier(.2,.8,.2,1)}
 .hero-final-start:focus-visible{
   outline:3px solid rgba(70,145,235,.48);
   outline-offset:5px;
@@ -305,6 +332,26 @@ body[data-screen="test"] .brand-logo{height:52px;max-width:min(60vw,440px)}
 @keyframes progress-pop{0%{transform:scale(.86);opacity:.7}70%{transform:scale(1.05);opacity:1}100%{transform:scale(1)}}
 @keyframes marker-bounce{0%{transform:translateY(8px) scale(.92)}55%{transform:translateY(-10px) scale(1.06)}100%{transform:translateY(0) scale(1)}}
 @keyframes question-card-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+
+@keyframes cta-breathe{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-2px) scale(1.014)}
+}
+@keyframes cta-shadow{
+  0%,100%{filter:drop-shadow(0 10px 16px rgba(255,121,96,.14))}
+  50%{filter:drop-shadow(0 15px 26px rgba(255,121,96,.24))}
+}
+@keyframes cta-halo{
+  0%,100%{opacity:.18;transform:scale(.96)}
+  50%{opacity:.42;transform:scale(1.035)}
+}
+@keyframes cta-sheen{
+  0%,62%{opacity:0;background-position:150% 0}
+  67%{opacity:.72}
+  82%{opacity:.72;background-position:-55% 0}
+  88%,100%{opacity:0;background-position:-55% 0}
+}
 
 /* Loading is a short transition, not a second result screen. */
 .loading-card{display:grid;place-items:center;min-height:570px;padding:50px;text-align:center;background:linear-gradient(145deg,#fff8e9,#eef8ff 55%,#effcf5)}
@@ -620,9 +667,6 @@ body[data-screen="test"] .brand-logo{height:52px;max-width:min(60vw,440px)}
     padding:0!important;
     transform:translateX(-50%)!important;
   }
-  body[data-screen="home"] .hero-final-start img{
-    animation:hero-start-bob 1.9s ease-in-out infinite, hero-start-glow 2.2s ease-in-out infinite!important;
-  }
 }
 
 @media print{
@@ -639,4 +683,9 @@ body[data-screen="test"] .brand-logo{height:52px;max-width:min(60vw,440px)}
 
 @media (prefers-reduced-motion:reduce){
   .hero-final-start img{animation:none!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-final-start img,.hero-final-start:before,.hero-final-start:after{animation:none!important}
+  .hero-final-start:after{display:none!important}
 }
